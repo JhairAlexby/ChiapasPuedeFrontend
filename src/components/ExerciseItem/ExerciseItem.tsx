@@ -44,8 +44,14 @@ export const ExerciseItem = ({ exercise, onClick }: ExerciseItemProps) => {
     }
   };
   
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    console.log('Exercise clicked:', exercise);
+    onClick();
+  };
+  
   return (
-    <Card className="exercise-item" onClick={onClick}>
+    <Card className="exercise-item" onClick={handleClick}>
       <div className="exercise-icon">
         {getExerciseEmoji(exercise.type)}
       </div>
