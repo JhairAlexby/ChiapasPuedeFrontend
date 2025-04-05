@@ -4,7 +4,7 @@ import './ExerciseItem.css';
 
 interface ExerciseItemProps {
   exercise: Exercise;
-  onClick: () => void;
+  onClick: (exercise: Exercise) => void;  // Updated to accept the exercise parameter
 }
 
 export const ExerciseItem = ({ exercise, onClick }: ExerciseItemProps) => {
@@ -47,7 +47,7 @@ export const ExerciseItem = ({ exercise, onClick }: ExerciseItemProps) => {
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     console.log('Exercise clicked:', exercise);
-    onClick();
+    onClick(exercise);  // Pass the exercise to the onClick handler
   };
   
   return (

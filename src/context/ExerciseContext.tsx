@@ -38,7 +38,7 @@ export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
       
       const exercisesWithUniqueIds = exercises.map((exercise, index) => ({
         ...exercise,
-        id: generateUniqueId(exercise, level, index)
+        id: `${exercise.id || 'exercise'}-${level}-${index}-${Date.now()}`
       }));
       
       setExercisesList(exercisesWithUniqueIds);
