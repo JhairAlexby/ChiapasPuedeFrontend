@@ -1,0 +1,80 @@
+.button {
+    border-radius: 12px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .button-primary {
+    background-color: #4f46e5;
+    color: white;
+  }
+  
+  .button-primary:hover:not(:disabled) {
+    background-color: #4338ca;
+  }
+  
+  .button-secondary {
+    background-color: #6b7280;
+    color: white;
+  }
+  
+  .button-secondary:hover:not(:disabled) {
+    background-color: #4b5563;
+  }
+  
+  .button-success {
+    background-color: #10b981;
+    color: white;
+  }
+  
+  .button-success:hover:not(:disabled) {
+    background-color: #059669;
+  }
+  
+  .button-warning {
+    background-color: #f59e0b;
+    color: white;
+  }
+  
+  .button-warning:hover:not(:disabled) {
+    background-color: #d97706;
+  }
+  
+  .button-danger {
+    background-color: #ef4444;
+    color: white;
+  }
+  
+  .button-danger:hover:not(:disabled) {
+    background-color: #dc2626;
+  }
+  
+  .button-small {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .button-medium {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+  
+  .button-large {
+    padding: 1rem 2rem;
+    font-size: 1.125rem;
+  }
+  
+  .full-width {
+    width: 100%;
+  }
+  

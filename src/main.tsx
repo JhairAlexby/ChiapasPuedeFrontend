@@ -1,10 +1,22 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { StudentProvider } from './context/StudentContext';
+import { ExerciseProvider } from './context/ExerciseContext';
+import App from './App';
+import './index.css';
 
-createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root');
+
+if (!rootElement) {
+  throw new Error('No se encontró el elemento root en el HTML');
+}
+
+createRoot(rootElement).render(
   <StrictMode>
-    <App />
-  </StrictMode>,
-)
+    <StudentProvider>
+      <ExerciseProvider>
+        <App />
+      </ExerciseProvider>
+    </StudentProvider>
+  </StrictMode>
+);

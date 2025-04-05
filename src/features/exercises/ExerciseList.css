@@ -1,0 +1,12 @@
+.exercise-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .exercise-list-loading,
+  .exercise-list-empty {
+    padding: 2rem;
+    text-align: center;
+    color: #6b7280;
+  }

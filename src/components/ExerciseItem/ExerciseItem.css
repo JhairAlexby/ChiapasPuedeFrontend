@@ -1,0 +1,33 @@
+.exercise-item {
+    cursor: pointer;
+    transition: transform 0.2s;
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+  }
+  
+  .exercise-item:hover {
+    transform: translateY(-2px);
+  }
+  
+  .exercise-icon {
+    font-size: 2rem;
+    margin-right: 1rem;
+  }
+  
+  .exercise-details {
+    flex: 1;
+  }
+  
+  .exercise-type {
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+  }
+  
+  .exercise-preview {
+    font-size: 0.875rem;
+    color: #6b7280;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
