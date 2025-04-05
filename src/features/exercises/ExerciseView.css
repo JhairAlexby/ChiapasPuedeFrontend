@@ -70,6 +70,8 @@
     transition: all 0.2s ease;
     min-width: 80px;
     text-align: center;
+    color: #000000; /* Make text black */
+    font-weight: 500; /* Make text slightly bolder */
   }
   
   .option-button:hover {
@@ -79,7 +81,7 @@
   
   .option-button.selected {
     background-color: #4a90e2;
-    color: white;
+    color: white; /* Keep selected button text white for contrast */
     border-color: #3a80d2;
   }
   

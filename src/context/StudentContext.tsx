@@ -70,6 +70,10 @@ export const StudentProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   // Actualizar progreso de un estudiante
+  // Add a tracking mechanism to prevent duplicate updates
+  const [lastUpdatedExerciseId, setLastUpdatedExerciseId] = useState<string | null>(null);
+  
+  // Modify the refreshStudentProgress function
   const refreshStudentProgress = async (studentId: string) => {
     try {
       console.log("Refreshing progress for student:", studentId);
@@ -101,54 +105,47 @@ export const StudentProvider = ({ children }: { children: ReactNode }) => {
         );
       } else {
         // If API returns null, manually update the student progress
-        console.log("API returned null, manually updating student progress");
+        // But only if we haven't already updated for this exercise
         if (currentStudent && currentStudent.id === studentId) {
-          const updatedProgress = {
-            ...currentStudent.progress,
-            exercisesCompleted: currentStudent.progress.exercisesCompleted + 1,
-            correctAnswers: currentStudent.progress.correctAnswers + 1,
-          };
+          // Get exerciseId from evaluation context or state
+          const currentExerciseId = null; // TODO: Add proper evaluation result state/context
           
-          const manuallyUpdatedStudent = {
-            ...currentStudent,
-            progress: updatedProgress
-          };
-          
-          console.log("Manually updated student:", manuallyUpdatedStudent);
-          setCurrentStudent(manuallyUpdatedStudent);
-          
-          // Also update in the students list
-          setStudents(prevStudents => 
-            prevStudents.map(student => 
-              student.id === studentId ? manuallyUpdatedStudent : student
-            )
-          );
+          // Only update if this is a new exercise completion
+          if (currentExerciseId && lastUpdatedExerciseId !== currentExerciseId) {
+            setLastUpdatedExerciseId(currentExerciseId);
+            
+            const updatedProgress = {
+              ...currentStudent.progress,
+              exercisesCompleted: currentStudent.progress.exercisesCompleted + 1,
+              correctAnswers: currentExerciseId
+                ? currentStudent.progress.correctAnswers + 1 
+                : currentStudent.progress.correctAnswers,
+              incorrectAnswers: currentExerciseId
+                ? currentStudent.progress.incorrectAnswers + 1 
+                : currentStudent.progress.incorrectAnswers,
+            };
+            
+            const manuallyUpdatedStudent = {
+              ...currentStudent,
+              progress: updatedProgress
+            };
+            
+            console.log("Manually updated student:", manuallyUpdatedStudent);
+            setCurrentStudent(manuallyUpdatedStudent);
+            
+            // Also update in the students list
+            setStudents(prevStudents => 
+              prevStudents.map(student => 
+                student.id === studentId ? manuallyUpdatedStudent : student
+              )
+            );
+          } else {
+            console.log("Skipping duplicate update for exercise:", currentExerciseId);
+          }
         }
       }
     } catch (error) {
       console.error('Error al actualizar progreso:', error);
-      // Even if there's an error, try to update the UI
-      if (currentStudent && currentStudent.id === studentId) {
-        const updatedProgress = {
-          ...currentStudent.progress,
-          exercisesCompleted: currentStudent.progress.exercisesCompleted + 1,
-          correctAnswers: currentStudent.progress.correctAnswers + 1,
-        };
-        
-        const manuallyUpdatedStudent = {
-          ...currentStudent,
-          progress: updatedProgress
-        };
-        
-        console.log("Error occurred, manually updated student:", manuallyUpdatedStudent);
-        setCurrentStudent(manuallyUpdatedStudent);
-        
-        setStudents(prevStudents => 
-          prevStudents.map(student => 
-            student.id === studentId ? manuallyUpdatedStudent : student
-          )
-        );
-      }
     }
   };
 

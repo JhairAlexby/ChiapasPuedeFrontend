@@ -44,8 +44,22 @@ export const ExerciseView = () => {
   
   const hasOptions = !!currentExercise.options && currentExercise.options.length > 0;
   
+  // Add a new state to track if a submission is in progress
+  const [isTimerSubmitting, setIsTimerSubmitting] = useState(false);
+  
+  // Modify the handleTimeOut function to prevent multiple submissions
+  const handleTimeOut = () => {
+    // Only submit if not already submitting
+    if (!isSubmitting && !isTimerSubmitting) {
+      setIsTimerSubmitting(true);
+      handleSubmit();
+    }
+  };
+  
+  // Modify the handleSubmit function to prevent multiple calls
+  // Modify the handleSubmit function to correctly evaluate answers
   const handleSubmit = async () => {
-    if (!currentExercise || !currentStudent) return;
+    if (!currentExercise || !currentStudent || isSubmitting) return;
     
     const responseTime = Date.now() - startTime;
     setIsSubmitting(true);
@@ -54,7 +68,8 @@ export const ExerciseView = () => {
       console.log('Enviando respuesta:', {
         studentId: currentStudent.id,
         exerciseId: currentExercise.id,
-        answer: hasOptions ? selectedOption || '' : userAnswer
+        answer: hasOptions ? selectedOption || '' : userAnswer,
+        correctAnswer: currentExercise.correctAnswer // Log the correct answer for debugging
       });
       
       // Preparar respuesta
@@ -73,12 +88,24 @@ export const ExerciseView = () => {
         result = await EvaluationAPI.evaluateResponse(studentResponse);
       } catch (error) {
         console.error('Error en la API de evaluación, usando respuesta simulada', error);
+        
+        // Check if the selected answer matches the correct answer
+        const isCorrect = hasOptions ? 
+          selectedOption === currentExercise.correctAnswer : 
+          userAnswer.trim().toLowerCase() === currentExercise.correctAnswer?.toLowerCase();
+        
+        console.log('Evaluación local:', {
+          selectedOption,
+          correctAnswer: currentExercise.correctAnswer,
+          isCorrect
+        });
+        
         // Simular respuesta si hay error con la API
         result = {
           studentId: currentStudent.id,
           exerciseId: currentExercise.id,
-          isCorrect: hasOptions && selectedOption === currentExercise.correctAnswer,
-          feedback: hasOptions && selectedOption === currentExercise.correctAnswer ? 
+          isCorrect: isCorrect,
+          feedback: isCorrect ? 
             '¡Respuesta correcta!' : 
             `La respuesta correcta era: ${currentExercise.correctAnswer || 'N/A'}`
         };
@@ -88,7 +115,7 @@ export const ExerciseView = () => {
         console.log('Resultado de evaluación:', result);
         setLastEvaluationResult(result);
         
-        // Ensure progress is updated by waiting for the refresh to complete
+        // Only refresh progress once
         try {
           await refreshStudentProgress(currentStudent.id);
           console.log("Progress refreshed successfully");
@@ -100,11 +127,12 @@ export const ExerciseView = () => {
       // Cerrar ejercicio
       setTimeout(() => {
         setCurrentExercise(null);
-      }, 1000); // Increased timeout to ensure progress update completes
+      }, 1000);
     } catch (error) {
       console.error('Error al enviar respuesta:', error);
     } finally {
       setIsSubmitting(false);
+      setIsTimerSubmitting(false);
     }
   };
   
@@ -219,11 +247,6 @@ export const ExerciseView = () => {
           />
         );
     }
-  };
-  
-  const handleTimeOut = () => {
-    // Si el tiempo se acaba, enviamos la respuesta actual
-    handleSubmit();
   };
   
   const isAnswerValid = hasOptions ? !!selectedOption : userAnswer.trim().length > 0;
