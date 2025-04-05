@@ -1,4 +1,3 @@
-// src/features/exercises/ExerciseList.tsx
 import { useExercise } from '../../context/ExerciseContext';
 import { ExerciseItem } from '../../components/ExerciseItem/ExerciseItem';
 import './ExerciseList.css';
@@ -22,7 +21,7 @@ export const ExerciseList = () => {
     <div className="exercise-list">
       {exercisesList.map((exercise, index) => (
         <ExerciseItem
-          key={`${exercise.id}-${index}`} // Add index to ensure uniqueness
+          key={`${exercise.id}-${index}`} 
           exercise={exercise}
           onClick={(exercise) => setCurrentExercise(exercise)}
         />

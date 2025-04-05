@@ -2,7 +2,6 @@ import { StudentResponse, EvaluationResult } from '../types/evaluation.types';
 import { API_BASE_URL } from './config';
 
 export const EvaluationAPI = {
-  // Enviar respuesta del estudiante para evaluación
   async evaluateResponse(studentResponse: StudentResponse): Promise<EvaluationResult | null> {
     try {
       const response = await fetch(`${API_BASE_URL}/evaluation`, {

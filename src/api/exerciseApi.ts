@@ -2,7 +2,6 @@ import { DifficultyLevel, Exercise } from '../types/exercise.types';
 import { API_BASE_URL } from './config';
 
 export const ExerciseAPI = {
-  // Obtener ejercicios por nivel de dificultad
   async getExercisesByLevel(level: DifficultyLevel): Promise<Exercise[]> {
     try {
       const response = await fetch(`${API_BASE_URL}/exercises/${level}`);
@@ -16,7 +15,6 @@ export const ExerciseAPI = {
     }
   },
 
-  // Generar nuevos ejercicios
   async generateExercises(level: DifficultyLevel, count: number = 5): Promise<boolean> {
     try {
       const response = await fetch(`${API_BASE_URL}/exercises/generate/${level}?count=${count}`, {

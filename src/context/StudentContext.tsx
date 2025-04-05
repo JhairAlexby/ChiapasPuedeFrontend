@@ -1,4 +1,3 @@
-// src/context/StudentContext.tsx
 import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { Student } from '../types/student.types';
 import { DifficultyLevel } from '../types/exercise.types';
@@ -12,7 +11,6 @@ interface StudentContextProps {
   refreshStudentProgress: (studentId: string) => Promise<void>;
 }
 
-// Crear un estudiante demo con la estructura correcta
 const createDemoStudent = (): Student => ({
   id: 'demo-student',
   name: 'Estudiante Demo',
@@ -32,7 +30,6 @@ export const StudentProvider = ({ children }: { children: ReactNode }) => {
   const [students, setStudents] = useState<Student[]>([]);
   const [loadingStudents, setLoadingStudents] = useState(false);
 
-  // Cargar lista de estudiantes
   useEffect(() => {
     let mounted = true;
     
@@ -69,11 +66,9 @@ export const StudentProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  // Actualizar progreso de un estudiante
-  // Add a tracking mechanism to prevent duplicate updates
+ 
   const [lastUpdatedExerciseId, setLastUpdatedExerciseId] = useState<string | null>(null);
   
-  // Modify the refreshStudentProgress function
   const refreshStudentProgress = async (studentId: string) => {
     try {
       console.log("Refreshing progress for student:", studentId);
@@ -81,7 +76,6 @@ export const StudentProvider = ({ children }: { children: ReactNode }) => {
       console.log("Received updated student data:", updatedStudent);
       
       if (updatedStudent) {
-        // Asegurarse de que la estructura de progress esté completa
         if (!updatedStudent.progress) {
           updatedStudent.progress = {
             exercisesCompleted: 0,
@@ -91,26 +85,21 @@ export const StudentProvider = ({ children }: { children: ReactNode }) => {
           };
         }
         
-        // Actualizar estudiante actual si es el mismo
         if (currentStudent?.id === studentId) {
           console.log("Updating current student with new progress:", updatedStudent.progress);
           setCurrentStudent(updatedStudent);
         }
         
-        // Actualizar en la lista de estudiantes
         setStudents(prevStudents => 
           prevStudents.map(student => 
             student.id === studentId ? updatedStudent : student
           )
         );
       } else {
-        // If API returns null, manually update the student progress
-        // But only if we haven't already updated for this exercise
+       
         if (currentStudent && currentStudent.id === studentId) {
-          // Get exerciseId from evaluation context or state
-          const currentExerciseId = null; // TODO: Add proper evaluation result state/context
+          const currentExerciseId = null; 
           
-          // Only update if this is a new exercise completion
           if (currentExerciseId && lastUpdatedExerciseId !== currentExerciseId) {
             setLastUpdatedExerciseId(currentExerciseId);
             
@@ -133,7 +122,6 @@ export const StudentProvider = ({ children }: { children: ReactNode }) => {
             console.log("Manually updated student:", manuallyUpdatedStudent);
             setCurrentStudent(manuallyUpdatedStudent);
             
-            // Also update in the students list
             setStudents(prevStudents => 
               prevStudents.map(student => 
                 student.id === studentId ? manuallyUpdatedStudent : student

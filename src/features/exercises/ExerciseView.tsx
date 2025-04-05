@@ -1,4 +1,3 @@
-// src/features/exercises/ExerciseView.tsx
 import { useState, useEffect } from 'react';
 import { useExercise } from '../../context/ExerciseContext';
 import { useStudent } from '../../context/StudentContext';
@@ -27,7 +26,6 @@ export const ExerciseView = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [startTime, setStartTime] = useState<number>(0);
   
-  // Reiniciar estado cuando cambia el ejercicio
   useEffect(() => {
     if (currentExercise) {
       console.log('ExerciseView montado con ejercicio:', currentExercise);
@@ -44,19 +42,15 @@ export const ExerciseView = () => {
   
   const hasOptions = !!currentExercise.options && currentExercise.options.length > 0;
   
-  // Add a new state to track if a submission is in progress
   const [isTimerSubmitting, setIsTimerSubmitting] = useState(false);
   
-  // Modify the handleTimeOut function to prevent multiple submissions
   const handleTimeOut = () => {
-    // Only submit if not already submitting
     if (!isSubmitting && !isTimerSubmitting) {
       setIsTimerSubmitting(true);
       handleSubmit();
     }
   };
   
-// Modificación en handleSubmit() en ExerciseView.tsx
 const handleSubmit = async () => {
   if (!currentExercise || !currentStudent || isSubmitting) return;
   
@@ -150,7 +144,6 @@ const handleSubmit = async () => {
     setSelectedOption(option);
   };
   
-  // In your renderExerciseContent function, add more debugging:
   
   const renderExerciseContent = () => {
     console.log("Rendering exercise content:", {
@@ -160,7 +153,6 @@ const handleSubmit = async () => {
       optionsLength: currentExercise.options?.length
     });
     
-    // Force options to be visible regardless of exercise type for testing
     if (currentExercise.options && currentExercise.options.length > 0) {
       return (
         <div className="exercise-options" style={{border: '1px solid red'}}>
@@ -178,7 +170,6 @@ const handleSubmit = async () => {
       );
     }
     
-    // Original switch case can remain below as fallback
     switch (currentExercise.type) {
       case ExerciseType.LETTER_RECOGNITION:
       case ExerciseType.SYLLABLE_FORMATION:

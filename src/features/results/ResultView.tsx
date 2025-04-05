@@ -1,4 +1,3 @@
-// src/features/results/ResultView.tsx
 import { useExercise } from '../../context/ExerciseContext';
 import { Card } from '../../components/Card/Card';
 import { Button } from '../../components/Button/Button';

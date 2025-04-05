@@ -1,126 +1,107 @@
-// src/features/auth/StudentLogin.tsx
 import { useState, useEffect } from 'react';
 import { useStudent } from '../../context/StudentContext';
 import { Card } from '../../components/Card/Card';
 import { Button } from '../../components/Button/Button';
 import { Student } from '../../types/student.types';
-import { DifficultyLevel } from '../../types/exercise.types';
 import './StudentLogin.css';
 
-// Función para crear un nuevo estudiante con la estructura correcta
-const createNewStudent = (name: string): Student => ({
-  id: `student-${Date.now()}`,
-  name: name.trim(),
-  currentLevel: DifficultyLevel.BEGINNER,
-  progress: {
-    exercisesCompleted: 0,
-    correctAnswers: 0,
-    incorrectAnswers: 0,
-    averageResponseTime: 0
-  }
-});
-
 export const StudentLogin = () => {
-  const { students, setCurrentStudent, loadingStudents } = useStudent();
+  const { students, setCurrentStudent, loadingStudents, refreshStudentProgress } = useStudent();
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
-  const [newStudentName, setNewStudentName] = useState('');
-  const [isCreatingNew, setIsCreatingNew] = useState(false);
 
-  // Preseleccionar el primer estudiante si hay solo uno
   useEffect(() => {
-    if (students.length === 1) {
-      setSelectedStudent(students[0]);
+    if (!loadingStudents && students) { 
+      if (students.length === 1) {
+        const unicoEstudiante = students[0];
+        console.log("Iniciando sesión automáticamente con el único estudiante:", unicoEstudiante);
+        refreshStudentProgress(unicoEstudiante.id)
+            .catch(err => {
+                console.error("Error al refrescar progreso para auto-login, usando datos locales:", err);
+            })
+            .finally(() => {
+                 
+                 setCurrentStudent(unicoEstudiante);
+            });
+
+      } else if (students.length > 1) {
+        
+      }
     }
-  }, [students]);
+  }, [loadingStudents, students, setCurrentStudent, refreshStudentProgress]); // Dependencias del efecto
 
   const handleLogin = () => {
     if (selectedStudent) {
+      refreshStudentProgress(selectedStudent.id)
+        .catch(e => console.error("Error refrescando progreso en login manual", e))
+        .finally(() => {
+        });
       setCurrentStudent(selectedStudent);
     }
   };
 
-  const handleCreateStudent = () => {
-    if (newStudentName.trim()) {
-      // Crear un nuevo estudiante con la estructura correcta
-      const newStudent = createNewStudent(newStudentName);
-      setSelectedStudent(newStudent);
-      setCurrentStudent(newStudent);
-    }
-  };
-
+ 
   if (loadingStudents) {
     return (
       <div className="student-login-container">
-        <Card title="Cargando estudiantes...">
-          <p>Por favor espera mientras cargamos la información...</p>
+        <Card title="Cargando...">
+          <p>Por favor espera...</p>
         </Card>
       </div>
     );
   }
 
-  return (
-    <div className="student-login-container">
-      <Card title="Bienvenido a Chiapas Puede">
-        {isCreatingNew ? (
-          <div className="create-student-form">
-            <h3>Crear nuevo estudiante</h3>
-            <input
-              type="text"
-              placeholder="Nombre del estudiante"
-              value={newStudentName}
-              onChange={(e) => setNewStudentName(e.target.value)}
-              className="student-name-input"
-            />
-            <div className="button-group">
-              <Button onClick={handleCreateStudent} disabled={!newStudentName.trim()}>
-                Crear y continuar
-              </Button>
-              <Button 
-                variant="secondary" 
-                onClick={() => setIsCreatingNew(false)}
-              >
-                Cancelar
-              </Button>
-            </div>
-          </div>
-        ) : (
+  if (!loadingStudents && students.length === 0) {
+     return (
+       <div className="student-login-container">
+         <Card title="Bienvenido a Chiapas Puede">
+           <p>No hay perfiles de estudiante disponibles. Contacta al administrador.</p>
+         </Card>
+       </div>
+     );
+  }
+
+  
+  if (!loadingStudents && students.length > 1) {
+    return (
+      <div className="student-login-container">
+        <Card title="Bienvenido a Chiapas Puede">
           <>
             <h3>Selecciona tu perfil</h3>
-            {students.length > 0 ? (
-              <div className="student-list">
-                {students.map((student) => (
-                  <div
-                    key={student.id}
-                    className={`student-item ${selectedStudent?.id === student.id ? 'selected' : ''}`}
-                    onClick={() => setSelectedStudent(student)}
-                  >
-                    <div className="student-avatar">
-                      {student.name.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="student-name">{student.name}</div>
+            <div className="student-list">
+              {students.map((student) => (
+                <div
+                  key={student.id}
+                  className={`student-item ${selectedStudent?.id === student.id ? 'selected' : ''}`}
+                  onClick={() => setSelectedStudent(student)}
+                >
+                  <div className="student-avatar">
+                    {student.name.charAt(0).toUpperCase()}
                   </div>
-                ))}
-              </div>
-            ) : (
-              <p>No hay estudiantes registrados. Crea uno nuevo para comenzar.</p>
-            )}
+                  <div className="student-name">{student.name}</div>
+                </div>
+              ))}
+            </div>
             <div className="button-group">
-              <Button 
-                onClick={handleLogin} 
+              <Button
+                onClick={handleLogin}
                 disabled={!selectedStudent}
               >
                 Continuar
               </Button>
-              <Button 
-                variant="secondary" 
-                onClick={() => setIsCreatingNew(true)}
-              >
-                Crear nuevo estudiante
-              </Button>
             </div>
           </>
-        )}
-      </Card>
-    </div>
+        </Card>
+      </div>
+    );
+  }
+
+ 
+  return (
+       <div className="student-login-container">
+         <Card title="Iniciando sesión...">
+           <p>Un momento...</p>
+         </Card>
+       </div>
   );
-};
+
+}; 

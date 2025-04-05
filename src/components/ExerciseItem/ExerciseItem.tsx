@@ -4,11 +4,10 @@ import './ExerciseItem.css';
 
 interface ExerciseItemProps {
   exercise: Exercise;
-  onClick: (exercise: Exercise) => void;  // Updated to accept the exercise parameter
+  onClick: (exercise: Exercise) => void;  
 }
 
 export const ExerciseItem = ({ exercise, onClick }: ExerciseItemProps) => {
-  // Función para obtener un emoji según el tipo de ejercicio
   const getExerciseEmoji = (type: ExerciseType): string => {
     switch (type) {
       case ExerciseType.LETTER_RECOGNITION:
@@ -26,7 +25,6 @@ export const ExerciseItem = ({ exercise, onClick }: ExerciseItemProps) => {
     }
   };
   
-  // Función para obtener un título según el tipo de ejercicio
   const getExerciseTypeLabel = (type: ExerciseType): string => {
     switch (type) {
       case ExerciseType.LETTER_RECOGNITION:
@@ -47,7 +45,7 @@ export const ExerciseItem = ({ exercise, onClick }: ExerciseItemProps) => {
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     console.log('Exercise clicked:', exercise);
-    onClick(exercise);  // Pass the exercise to the onClick handler
+    onClick(exercise);  
   };
   
   return (

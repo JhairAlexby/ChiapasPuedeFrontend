@@ -1,4 +1,3 @@
-// src/context/ExerciseContext.tsx
 import { createContext, useState, useContext, ReactNode, useCallback } from 'react'; // Importa useCallback
 import { Exercise, DifficultyLevel, ExerciseType } from '../types/exercise.types';
 import { ExerciseAPI } from '../api/exerciseApi';
@@ -7,7 +6,7 @@ import { EvaluationResult } from '../types/evaluation.types';
 interface ExerciseContextProps {
   currentExercise: Exercise | null;
   exercisesList: Exercise[];
-  viewedLevel: DifficultyLevel | null; // <-- NUEVO: Nivel que se está viendo
+  viewedLevel: DifficultyLevel | null; 
   loadExercisesByLevel: (level: DifficultyLevel) => Promise<void>;
   setCurrentExercise: (exercise: Exercise | null) => void;
   loadingExercises: boolean;
@@ -22,13 +21,11 @@ export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
   const [exercisesList, setExercisesList] = useState<Exercise[]>([]);
   const [loadingExercises, setLoadingExercises] = useState(false);
   const [lastEvaluationResult, setLastEvaluationResultState] = useState<EvaluationResult | null>(null);
-  // NUEVO: Estado para guardar el nivel seleccionado por el usuario
   const [viewedLevel, setViewedLevel] = useState<DifficultyLevel | null>(null);
 
-  // Usamos useCallback para estabilizar la referencia de la función
   const loadExercisesByLevel = useCallback(async (level: DifficultyLevel) => {
     console.log("Cargando ejercicios para nivel:", level);
-    setViewedLevel(level); // <-- ACTUALIZA el nivel que se está viendo
+    setViewedLevel(level); 
     setLoadingExercises(true);
     try {
       let exercises = await ExerciseAPI.getExercisesByLevel(level);
@@ -60,13 +57,11 @@ export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setLoadingExercises(false);
     }
-  }, []); // Dependencia vacía para useCallback, la función no depende de props o estado externo a ella
+  }, []); 
 
-  // ... (createDemoExercises y el resto sin cambios) ...
-   // Función para crear ejercicios de demostración si hay problemas con la API
+  
   const createDemoExercises = (level: DifficultyLevel): Exercise[] => {
     const timestamp = Date.now();
-    // (Asegúrate que todos los IDs aquí sean strings no vacíos)
     switch (level) {
       case DifficultyLevel.BEGINNER:
         return [
@@ -88,7 +83,6 @@ export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
             correctAnswer: 'MA',
             timeLimit: 30
           }
-          // ... otros ejercicios demo ...
         ];
        case DifficultyLevel.INTERMEDIATE:
          return [
@@ -122,14 +116,13 @@ export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
             timeLimit: 60
           }
          ];
-      // ... otros niveles demo ...
       default:
         return [];
     }
   };
 
   const setCurrentExercise = (exercise: Exercise | null) => {
-    console.log("Cambiando ejercicio actual:", exercise); // Verifica que el ID aquí sea el UUID original
+    console.log("Cambiando ejercicio actual:", exercise); 
     setCurrentExerciseState(exercise);
   };
 
@@ -144,7 +137,7 @@ export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
       value={{
         currentExercise,
         exercisesList,
-        viewedLevel, // <-- Expone el nuevo estado
+        viewedLevel, 
         loadExercisesByLevel,
         setCurrentExercise,
         loadingExercises,
