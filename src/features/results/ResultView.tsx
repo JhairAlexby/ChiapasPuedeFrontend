@@ -1,3 +1,4 @@
+// src/features/results/ResultView.tsx
 import { useExercise } from '../../context/ExerciseContext';
 import { Card } from '../../components/Card/Card';
 import { Button } from '../../components/Button/Button';
@@ -10,9 +11,18 @@ export const ResultView = () => {
     return null;
   }
   
+  console.log("Mostrando resultado:", lastEvaluationResult);
+  
   const handleClose = () => {
+    console.log("Cerrando resultado");
     setLastEvaluationResult(null);
   };
+  
+  // Generar feedback si no existe
+  const feedback = lastEvaluationResult.feedback || 
+    (lastEvaluationResult.isCorrect 
+      ? '¡Muy bien! Has respondido correctamente.' 
+      : 'No te preocupes, sigue practicando para mejorar.');
   
   return (
     <div className="result-view-overlay">
@@ -29,7 +39,7 @@ export const ResultView = () => {
                 : 'Respuesta incorrecta'}
             </h2>
             
-            <p className="result-feedback">{lastEvaluationResult.feedback}</p>
+            <p className="result-feedback">{feedback}</p>
             
             <Button onClick={handleClose} fullWidth>
               Continuar

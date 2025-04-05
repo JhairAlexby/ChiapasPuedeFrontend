@@ -1,3 +1,4 @@
+// src/context/StudentContext.tsx
 import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { Student } from '../types/student.types';
 import { DifficultyLevel } from '../types/exercise.types';
@@ -11,6 +12,19 @@ interface StudentContextProps {
   refreshStudentProgress: (studentId: string) => Promise<void>;
 }
 
+// Crear un estudiante demo con la estructura correcta
+const createDemoStudent = (): Student => ({
+  id: 'demo-student',
+  name: 'Estudiante Demo',
+  currentLevel: DifficultyLevel.BEGINNER,
+  progress: {
+    exercisesCompleted: 0,
+    correctAnswers: 0,
+    incorrectAnswers: 0,
+    averageResponseTime: 0
+  }
+});
+
 const StudentContext = createContext<StudentContextProps | undefined>(undefined);
 
 export const StudentProvider = ({ children }: { children: ReactNode }) => {
@@ -20,35 +34,39 @@ export const StudentProvider = ({ children }: { children: ReactNode }) => {
 
   // Cargar lista de estudiantes
   useEffect(() => {
+    let mounted = true;
+    
     const loadStudents = async () => {
       setLoadingStudents(true);
       try {
         const loadedStudents = await StudentAPI.getAllStudents();
-        setStudents(loadedStudents);
         
-        // Si no hay estudiantes, creamos uno demo para facilitar pruebas
-        if (loadedStudents.length === 0) {
-          const demoStudent: Student = {
-            id: 'demo-student',
-            name: 'Estudiante Demo',
-            currentLevel: DifficultyLevel.BEGINNER,
-            progress: {
-              exercisesCompleted: 0,
-              correctAnswers: 0,
-              incorrectAnswers: 0,
-              averageResponseTime: 0
-            }
-          };
-          setStudents([demoStudent]);
+        if (mounted) {
+          if (loadedStudents && loadedStudents.length > 0) {
+            setStudents(loadedStudents);
+          } else {
+            const demoStudent = createDemoStudent();
+            setStudents([demoStudent]);
+          }
         }
       } catch (error) {
         console.error('Error al cargar estudiantes:', error);
+        if (mounted) {
+          const demoStudent = createDemoStudent();
+          setStudents([demoStudent]);
+        }
       } finally {
-        setLoadingStudents(false);
+        if (mounted) {
+          setLoadingStudents(false);
+        }
       }
     };
     
     loadStudents();
+    
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // Actualizar progreso de un estudiante
@@ -56,6 +74,16 @@ export const StudentProvider = ({ children }: { children: ReactNode }) => {
     try {
       const updatedStudent = await StudentAPI.getStudentProgress(studentId);
       if (updatedStudent) {
+        // Asegurarse de que la estructura de progress esté completa
+        if (!updatedStudent.progress) {
+          updatedStudent.progress = {
+            exercisesCompleted: 0,
+            correctAnswers: 0,
+            incorrectAnswers: 0,
+            averageResponseTime: 0
+          };
+        }
+        
         // Actualizar estudiante actual si es el mismo
         if (currentStudent?.id === studentId) {
           setCurrentStudent(updatedStudent);

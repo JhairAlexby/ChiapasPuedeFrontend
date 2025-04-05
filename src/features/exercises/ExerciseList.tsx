@@ -1,6 +1,6 @@
+// src/features/exercises/ExerciseList.tsx
 import { useExercise } from '../../context/ExerciseContext';
 import { ExerciseItem } from '../../components/ExerciseItem/ExerciseItem';
-import { Button } from '../../components/Button/Button';
 import './ExerciseList.css';
 
 export const ExerciseList = () => {
@@ -18,13 +18,21 @@ export const ExerciseList = () => {
     );
   }
   
+  // Eliminar ejercicios duplicados basados en el ID
+  const uniqueExercises = Array.from(
+    new Map(exercisesList.map(exercise => [exercise.id, exercise])).values()
+  );
+  
   return (
     <div className="exercise-list">
-      {exercisesList.map((exercise) => (
+      {uniqueExercises.map((exercise, index) => (
         <ExerciseItem 
-          key={exercise.id} 
+          key={`${exercise.id}-${index}`} // Combinamos ID e índice para garantizar unicidad
           exercise={exercise} 
-          onClick={() => setCurrentExercise(exercise)}
+          onClick={() => {
+            console.log('Ejercicio seleccionado:', exercise);
+            setCurrentExercise(exercise);
+          }}
         />
       ))}
     </div>

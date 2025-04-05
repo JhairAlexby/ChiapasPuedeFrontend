@@ -1,3 +1,4 @@
+// src/features/auth/StudentLogin.tsx
 import { useState, useEffect } from 'react';
 import { useStudent } from '../../context/StudentContext';
 import { Card } from '../../components/Card/Card';
@@ -5,6 +6,19 @@ import { Button } from '../../components/Button/Button';
 import { Student } from '../../types/student.types';
 import { DifficultyLevel } from '../../types/exercise.types';
 import './StudentLogin.css';
+
+// Función para crear un nuevo estudiante con la estructura correcta
+const createNewStudent = (name: string): Student => ({
+  id: `student-${Date.now()}`,
+  name: name.trim(),
+  currentLevel: DifficultyLevel.BEGINNER,
+  progress: {
+    exercisesCompleted: 0,
+    correctAnswers: 0,
+    incorrectAnswers: 0,
+    averageResponseTime: 0
+  }
+});
 
 export const StudentLogin = () => {
   const { students, setCurrentStudent, loadingStudents } = useStudent();
@@ -27,20 +41,8 @@ export const StudentLogin = () => {
 
   const handleCreateStudent = () => {
     if (newStudentName.trim()) {
-      // En una aplicación real, enviaríamos esta información al backend
-      // Aquí simplemente creamos un objeto de estudiante en memoria
-      const newStudent: Student = {
-        id: `student-${Date.now()}`,
-        name: newStudentName.trim(),
-        currentLevel: DifficultyLevel.BEGINNER,
-        progress: {
-          exercisesCompleted: 0,
-          correctAnswers: 0,
-          incorrectAnswers: 0,
-          averageResponseTime: 0
-        }
-      };
-      
+      // Crear un nuevo estudiante con la estructura correcta
+      const newStudent = createNewStudent(newStudentName);
       setSelectedStudent(newStudent);
       setCurrentStudent(newStudent);
     }

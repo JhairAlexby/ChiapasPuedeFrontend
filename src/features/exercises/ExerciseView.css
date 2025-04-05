@@ -1,20 +1,27 @@
+/* src/features/exercises/ExerciseView.css */
 .exercise-view-overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.6);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 100;
+    z-index: 1000;
+    padding: 20px;
   }
   
   .exercise-view-container {
     width: 100%;
     max-width: 600px;
-    padding: 1rem;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
   }
   
   .exercise-content {
@@ -30,17 +37,18 @@
   .exercise-input,
   .exercise-textarea {
     width: 100%;
-    padding: 0.75rem;
+    padding: 1rem;
     border-radius: 8px;
-    border: 1px solid #d1d5db;
-    font-size: 1rem;
+    border: 2px solid #d1d5db;
+    font-size: 1.1rem;
+    transition: all 0.2s ease;
   }
   
   .exercise-input:focus,
   .exercise-textarea:focus {
     outline: none;
     border-color: #4f46e5;
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
   }
   
   .exercise-options {
@@ -51,22 +59,25 @@
   }
   
   .option-button {
-    padding: 1rem;
+    padding: 1.2rem;
     border-radius: 8px;
     border: 2px solid #e5e7eb;
     background-color: white;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
   }
   
   .option-button:hover {
     border-color: #4f46e5;
+    background-color: #f9f9ff;
   }
   
   .option-button.selected {
     border-color: #4f46e5;
     background-color: #eff6ff;
+    font-weight: 700;
   }
   
   .exercise-actions {

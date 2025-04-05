@@ -1,3 +1,4 @@
+// src/features/dashboard/Dashboard.tsx
 import { useEffect } from 'react';
 import { useStudent } from '../../context/StudentContext';
 import { useExercise } from '../../context/ExerciseContext';
@@ -23,6 +24,14 @@ export const Dashboard = () => {
     return null;
   }
   
+  // Asegurarnos de que progress exista para evitar errores
+  const progress = currentStudent.progress || {
+    exercisesCompleted: 0,
+    correctAnswers: 0,
+    incorrectAnswers: 0,
+    averageResponseTime: 0
+  };
+  
   // Obtener etiqueta para nivel de dificultad
   const getLevelLabel = (level: DifficultyLevel) => {
     switch (level) {
@@ -37,10 +46,10 @@ export const Dashboard = () => {
     }
   };
   
-  // Calcular estadísticas
-  const totalAnswers = currentStudent.progress.correctAnswers + currentStudent.progress.incorrectAnswers;
+  // Calcular estadísticas con valores seguros
+  const totalAnswers = progress.correctAnswers + progress.incorrectAnswers;
   const correctPercentage = totalAnswers > 0 
-    ? Math.round((currentStudent.progress.correctAnswers / totalAnswers) * 100) 
+    ? Math.round((progress.correctAnswers / totalAnswers) * 100) 
     : 0;
   
   // Determinar color según el porcentaje de respuestas correctas
@@ -65,21 +74,21 @@ export const Dashboard = () => {
             <div className="stats-grid">
               <div className="stat-item">
                 <div className="stat-label">Ejercicios completados</div>
-                <div className="stat-value">{currentStudent.progress.exercisesCompleted}</div>
+                <div className="stat-value">{progress.exercisesCompleted}</div>
               </div>
               <div className="stat-item">
                 <div className="stat-label">Respuestas correctas</div>
-                <div className="stat-value">{currentStudent.progress.correctAnswers}</div>
+                <div className="stat-value">{progress.correctAnswers}</div>
               </div>
               <div className="stat-item">
                 <div className="stat-label">Respuestas incorrectas</div>
-                <div className="stat-value">{currentStudent.progress.incorrectAnswers}</div>
+                <div className="stat-value">{progress.incorrectAnswers}</div>
               </div>
               <div className="stat-item">
                 <div className="stat-label">Tiempo promedio de respuesta</div>
                 <div className="stat-value">
-                  {currentStudent.progress.averageResponseTime > 0 
-                    ? `${currentStudent.progress.averageResponseTime / 1000}s` 
+                  {progress.averageResponseTime > 0 
+                    ? `${progress.averageResponseTime / 1000}s` 
                     : 'N/A'}
                 </div>
               </div>
@@ -88,7 +97,7 @@ export const Dashboard = () => {
             <div className="performance-section">
               <div className="performance-label">Rendimiento general</div>
               <ProgressBar 
-                value={currentStudent.progress.correctAnswers} 
+                value={progress.correctAnswers} 
                 max={totalAnswers > 0 ? totalAnswers : 1} 
                 label="Respuestas correctas" 
               />

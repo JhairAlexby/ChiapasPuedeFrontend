@@ -1,3 +1,4 @@
+// src/context/ExerciseContext.tsx
 import { createContext, useState, useContext, ReactNode } from 'react';
 import { Exercise, DifficultyLevel } from '../types/exercise.types';
 import { ExerciseAPI } from '../api/exerciseApi';
@@ -15,29 +16,128 @@ interface ExerciseContextProps {
 
 const ExerciseContext = createContext<ExerciseContextProps | undefined>(undefined);
 
+const generateUniqueId = (exercise: Exercise, level: DifficultyLevel, index: number): string => {
+  if (!exercise.id) {
+    return `exercise-${level}-${index}-${Date.now()}`;
+  }
+  return exercise.id;
+};
+
 export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
-  const [currentExercise, setCurrentExercise] = useState<Exercise | null>(null);
+  const [currentExercise, setCurrentExerciseState] = useState<Exercise | null>(null);
   const [exercisesList, setExercisesList] = useState<Exercise[]>([]);
   const [loadingExercises, setLoadingExercises] = useState(false);
-  const [lastEvaluationResult, setLastEvaluationResult] = useState<EvaluationResult | null>(null);
+  const [lastEvaluationResult, setLastEvaluationResultState] = useState<EvaluationResult | null>(null);
 
   const loadExercisesByLevel = async (level: DifficultyLevel) => {
+    console.log("Cargando ejercicios para nivel:", level);
     setLoadingExercises(true);
     try {
       const exercises = await ExerciseAPI.getExercisesByLevel(level);
-      setExercisesList(exercises);
+      console.log("Ejercicios recibidos:", exercises);
       
-      // Si no hay ejercicios, intentamos generar algunos
+      const exercisesWithUniqueIds = exercises.map((exercise, index) => ({
+        ...exercise,
+        id: generateUniqueId(exercise, level, index)
+      }));
+      
+      setExercisesList(exercisesWithUniqueIds);
+      
       if (exercises.length === 0) {
+        console.log("No hay ejercicios, intentando generar nuevos...");
         await ExerciseAPI.generateExercises(level, 5);
         const newExercises = await ExerciseAPI.getExercisesByLevel(level);
-        setExercisesList(newExercises);
+        
+        const newExercisesWithUniqueIds = newExercises.map((exercise, index) => ({
+          ...exercise,
+          id: generateUniqueId(exercise, level, index)
+        }));
+        
+        setExercisesList(newExercisesWithUniqueIds);
+        console.log("Nuevos ejercicios generados:", newExercisesWithUniqueIds);
       }
     } catch (error) {
       console.error('Error al cargar ejercicios:', error);
+      const demoExercises = createDemoExercises(level);
+      setExercisesList(demoExercises);
+      console.log("Usando ejercicios demo:", demoExercises);
     } finally {
       setLoadingExercises(false);
     }
+  };
+
+  // Función para crear ejercicios de demostración si hay problemas con la API
+  const createDemoExercises = (level: DifficultyLevel): Exercise[] => {
+    const timestamp = Date.now();
+    switch (level) {
+      case DifficultyLevel.BEGINNER:
+        return [
+          {
+            id: `demo-letter-${timestamp}-1`,
+            type: 'letter_recognition',
+            difficultyLevel: level,
+            content: '¿Qué letra es esta? A',
+            options: ['A', 'E', 'I', 'O'],
+            correctAnswer: 'A',
+            timeLimit: 30
+          },
+          {
+            id: `demo-syllable-${timestamp}-2`,
+            type: 'syllable_formation',
+            difficultyLevel: level,
+            content: 'Forma una sílaba con la letra M y una vocal',
+            options: ['MA', 'LA', 'TA', 'PA'],
+            correctAnswer: 'MA',
+            timeLimit: 30
+          }
+        ];
+      case DifficultyLevel.INTERMEDIATE:
+        return [
+          {
+            id: `demo-word-${timestamp}-1`,
+            type: 'word_completion',
+            difficultyLevel: level,
+            content: 'Completa la palabra: CA_A',
+            options: ['S', 'M', 'R', 'L'],
+            correctAnswer: 'S',
+            timeLimit: 45
+          }
+        ];
+      case DifficultyLevel.ADVANCED:
+        return [
+          {
+            id: `demo-sentence-${timestamp}-1`,
+            type: 'sentence_formation',
+            difficultyLevel: level,
+            content: 'Ordena las palabras para formar una oración: gato el duerme sofá en el',
+            correctAnswer: 'El gato duerme en el sofá',
+            timeLimit: 60
+          },
+          {
+            id: `demo-text-${timestamp}-2`,
+            type: 'text_comprehension',
+            difficultyLevel: level,
+            content: 'Lee el siguiente texto y responde: "María juega en el parque con su pelota roja". ¿De qué color es la pelota de María?',
+            options: ['Roja', 'Azul', 'Verde', 'Amarilla'],
+            correctAnswer: 'Roja',
+            timeLimit: 60
+          }
+        ];
+      default:
+        return [];
+    }
+  };
+
+  // Función mejorada para establecer el ejercicio actual
+  const setCurrentExercise = (exercise: Exercise | null) => {
+    console.log("Cambiando ejercicio actual:", exercise);
+    setCurrentExerciseState(exercise);
+  };
+
+  // Función mejorada para establecer el resultado de evaluación
+  const setLastEvaluationResult = (result: EvaluationResult | null) => {
+    console.log("Estableciendo resultado de evaluación:", result);
+    setLastEvaluationResultState(result);
   };
 
   return (
