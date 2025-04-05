@@ -1,6 +1,6 @@
 // src/context/ExerciseContext.tsx
 import { createContext, useState, useContext, ReactNode } from 'react';
-import { Exercise, DifficultyLevel } from '../types/exercise.types';
+import { Exercise, DifficultyLevel, ExerciseType } from '../types/exercise.types';
 import { ExerciseAPI } from '../api/exerciseApi';
 import { EvaluationResult } from '../types/evaluation.types';
 
@@ -74,7 +74,7 @@ export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
         return [
           {
             id: `demo-letter-${timestamp}-1`,
-            type: 'letter_recognition',
+            type: ExerciseType.LETTER_RECOGNITION,  // Use enum instead of string
             difficultyLevel: level,
             content: '¿Qué letra es esta? A',
             options: ['A', 'E', 'I', 'O'],
@@ -83,7 +83,7 @@ export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
           },
           {
             id: `demo-syllable-${timestamp}-2`,
-            type: 'syllable_formation',
+            type: ExerciseType.SYLLABLE_FORMATION,  // Use enum instead of string
             difficultyLevel: level,
             content: 'Forma una sílaba con la letra M y una vocal',
             options: ['MA', 'LA', 'TA', 'PA'],
@@ -95,7 +95,7 @@ export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
         return [
           {
             id: `demo-word-${timestamp}-1`,
-            type: 'word_completion',
+            type: ExerciseType.WORD_COMPLETION,  // Use enum instead of string
             difficultyLevel: level,
             content: 'Completa la palabra: CA_A',
             options: ['S', 'M', 'R', 'L'],
@@ -107,7 +107,7 @@ export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
         return [
           {
             id: `demo-sentence-${timestamp}-1`,
-            type: 'sentence_formation',
+            type: ExerciseType.SENTENCE_FORMATION,  // Use enum instead of string
             difficultyLevel: level,
             content: 'Ordena las palabras para formar una oración: gato el duerme sofá en el',
             correctAnswer: 'El gato duerme en el sofá',
@@ -115,7 +115,7 @@ export const ExerciseProvider = ({ children }: { children: ReactNode }) => {
           },
           {
             id: `demo-text-${timestamp}-2`,
-            type: 'text_comprehension',
+            type: ExerciseType.TEXT_COMPREHENSION,  // Use enum instead of string
             difficultyLevel: level,
             content: 'Lee el siguiente texto y responde: "María juega en el parque con su pelota roja". ¿De qué color es la pelota de María?',
             options: ['Roja', 'Azul', 'Verde', 'Amarilla'],
