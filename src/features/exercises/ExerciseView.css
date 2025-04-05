@@ -51,33 +51,36 @@
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
   }
   
+  /* Add this to your ExerciseView.css file */
   .exercise-options {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 1rem;
-    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px 0;
+    justify-content: center;
   }
   
   .option-button {
-    padding: 1.2rem;
+    padding: 12px 20px;
+    background-color: #f0f0f0;
+    border: 2px solid #ddd;
     border-radius: 8px;
-    border: 2px solid #e5e7eb;
-    background-color: white;
-    font-size: 1.1rem;
-    font-weight: 500;
+    font-size: 16px;
     cursor: pointer;
     transition: all 0.2s ease;
+    min-width: 80px;
+    text-align: center;
   }
   
   .option-button:hover {
-    border-color: #4f46e5;
-    background-color: #f9f9ff;
+    background-color: #e0e0e0;
+    border-color: #ccc;
   }
   
   .option-button.selected {
-    border-color: #4f46e5;
-    background-color: #eff6ff;
-    font-weight: 700;
+    background-color: #4a90e2;
+    color: white;
+    border-color: #3a80d2;
   }
   
   .exercise-actions {

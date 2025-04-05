@@ -77,7 +77,7 @@ export const ExerciseView = () => {
         result = {
           studentId: currentStudent.id,
           exerciseId: currentExercise.id,
-          isCorrect: Math.random() > 0.5, // Simular correcto/incorrecto aleatoriamente
+          isCorrect: hasOptions && selectedOption === currentExercise.correctAnswer,
           feedback: hasOptions && selectedOption === currentExercise.correctAnswer ? 
             '¡Respuesta correcta!' : 
             `La respuesta correcta era: ${currentExercise.correctAnswer || 'N/A'}`
@@ -87,13 +87,20 @@ export const ExerciseView = () => {
       if (result) {
         console.log('Resultado de evaluación:', result);
         setLastEvaluationResult(result);
-        await refreshStudentProgress(currentStudent.id);
+        
+        // Ensure progress is updated by waiting for the refresh to complete
+        try {
+          await refreshStudentProgress(currentStudent.id);
+          console.log("Progress refreshed successfully");
+        } catch (refreshError) {
+          console.error("Error refreshing progress:", refreshError);
+        }
       }
       
       // Cerrar ejercicio
       setTimeout(() => {
         setCurrentExercise(null);
-      }, 500);
+      }, 1000); // Increased timeout to ensure progress update completes
     } catch (error) {
       console.error('Error al enviar respuesta:', error);
     } finally {
@@ -106,7 +113,35 @@ export const ExerciseView = () => {
     setSelectedOption(option);
   };
   
+  // In your renderExerciseContent function, add more debugging:
+  
   const renderExerciseContent = () => {
+    console.log("Rendering exercise content:", {
+      type: currentExercise.type,
+      hasOptions: hasOptions,
+      options: currentExercise.options,
+      optionsLength: currentExercise.options?.length
+    });
+    
+    // Force options to be visible regardless of exercise type for testing
+    if (currentExercise.options && currentExercise.options.length > 0) {
+      return (
+        <div className="exercise-options" style={{border: '1px solid red'}}>
+          {currentExercise.options.map((option, idx) => (
+            <button
+              key={`option-${idx}`}
+              className={`option-button ${selectedOption === option ? 'selected' : ''}`}
+              onClick={() => handleOptionSelect(option)}
+              style={{margin: '5px', padding: '10px', border: '1px solid blue'}}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      );
+    }
+    
+    // Original switch case can remain below as fallback
     switch (currentExercise.type) {
       case ExerciseType.LETTER_RECOGNITION:
       case ExerciseType.SYLLABLE_FORMATION:
