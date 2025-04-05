@@ -56,85 +56,94 @@ export const ExerciseView = () => {
     }
   };
   
-  // Modify the handleSubmit function to prevent multiple calls
-  // Modify the handleSubmit function to correctly evaluate answers
-  const handleSubmit = async () => {
-    if (!currentExercise || !currentStudent || isSubmitting) return;
+// Modificación en handleSubmit() en ExerciseView.tsx
+const handleSubmit = async () => {
+  if (!currentExercise || !currentStudent || isSubmitting) return;
+  
+  const responseTime = Date.now() - startTime;
+  setIsSubmitting(true);
+  
+  try {
+    console.log('Enviando respuesta:', {
+      studentId: currentStudent.id,
+      exerciseId: currentExercise.id,
+      answer: hasOptions ? selectedOption || '' : userAnswer,
+      correctAnswer: currentExercise.correctAnswer
+    });
     
-    const responseTime = Date.now() - startTime;
-    setIsSubmitting(true);
+    // Preparar respuesta
+    const studentResponse: StudentResponse = {
+      studentId: currentStudent.id,
+      exerciseId: currentExercise.id,
+      answer: hasOptions ? selectedOption || '' : userAnswer,
+      responseTimeMs: responseTime,
+      timestamp: new Date()
+    };
+    
+    // Enviar para evaluación
+    let result;
     
     try {
-      console.log('Enviando respuesta:', {
-        studentId: currentStudent.id,
-        exerciseId: currentExercise.id,
-        answer: hasOptions ? selectedOption || '' : userAnswer,
-        correctAnswer: currentExercise.correctAnswer // Log the correct answer for debugging
+      result = await EvaluationAPI.evaluateResponse(studentResponse);
+    } catch (error) {
+      console.error('Error en la API de evaluación, usando respuesta simulada', error);
+      
+      // Asegurarse de que la respuesta correcta esté definida
+      if (!currentExercise.correctAnswer) {
+        console.error('Error: ejercicio sin respuesta correcta definida', currentExercise);
+        throw new Error('Ejercicio sin respuesta correcta definida');
+      }
+      
+      // Comparación exacta con normalización
+      const userAnswerNormalized = hasOptions 
+        ? selectedOption?.trim().toLowerCase() || '' 
+        : userAnswer.trim().toLowerCase();
+      
+      const correctAnswerNormalized = currentExercise.correctAnswer.trim().toLowerCase();
+      
+      const isCorrect = userAnswerNormalized === correctAnswerNormalized;
+      
+      console.log('Evaluación local:', {
+        userAnswer: userAnswerNormalized,
+        correctAnswer: correctAnswerNormalized,
+        isCorrect
       });
       
-      // Preparar respuesta
-      const studentResponse: StudentResponse = {
+      // Simular respuesta si hay error con la API
+      result = {
         studentId: currentStudent.id,
         exerciseId: currentExercise.id,
-        answer: hasOptions ? selectedOption || '' : userAnswer,
-        responseTimeMs: responseTime,
-        timestamp: new Date()
+        isCorrect: isCorrect,
+        feedback: isCorrect 
+          ? '¡Respuesta correcta!' 
+          : `La respuesta correcta era: ${currentExercise.correctAnswer || 'N/A'}`
       };
-      
-      // Enviar para evaluación
-      let result;
-      
-      try {
-        result = await EvaluationAPI.evaluateResponse(studentResponse);
-      } catch (error) {
-        console.error('Error en la API de evaluación, usando respuesta simulada', error);
-        
-        // Check if the selected answer matches the correct answer
-        const isCorrect = hasOptions ? 
-          selectedOption === currentExercise.correctAnswer : 
-          userAnswer.trim().toLowerCase() === currentExercise.correctAnswer?.toLowerCase();
-        
-        console.log('Evaluación local:', {
-          selectedOption,
-          correctAnswer: currentExercise.correctAnswer,
-          isCorrect
-        });
-        
-        // Simular respuesta si hay error con la API
-        result = {
-          studentId: currentStudent.id,
-          exerciseId: currentExercise.id,
-          isCorrect: isCorrect,
-          feedback: isCorrect ? 
-            '¡Respuesta correcta!' : 
-            `La respuesta correcta era: ${currentExercise.correctAnswer || 'N/A'}`
-        };
-      }
-      
-      if (result) {
-        console.log('Resultado de evaluación:', result);
-        setLastEvaluationResult(result);
-        
-        // Only refresh progress once
-        try {
-          await refreshStudentProgress(currentStudent.id);
-          console.log("Progress refreshed successfully");
-        } catch (refreshError) {
-          console.error("Error refreshing progress:", refreshError);
-        }
-      }
-      
-      // Cerrar ejercicio
-      setTimeout(() => {
-        setCurrentExercise(null);
-      }, 1000);
-    } catch (error) {
-      console.error('Error al enviar respuesta:', error);
-    } finally {
-      setIsSubmitting(false);
-      setIsTimerSubmitting(false);
     }
-  };
+    
+    if (result) {
+      console.log('Resultado de evaluación:', result);
+      setLastEvaluationResult(result);
+      
+      // Refrescar progreso del estudiante
+      try {
+        await refreshStudentProgress(currentStudent.id);
+        console.log("Progress refreshed successfully");
+      } catch (refreshError) {
+        console.error("Error refreshing progress:", refreshError);
+      }
+    }
+    
+    // Cerrar ejercicio después de mostrar resultado
+    setTimeout(() => {
+      setCurrentExercise(null);
+    }, 1000);
+  } catch (error) {
+    console.error('Error al enviar respuesta:', error);
+  } finally {
+    setIsSubmitting(false);
+    setIsTimerSubmitting(false);
+  }
+};
   
   const handleOptionSelect = (option: string) => {
     console.log('Opción seleccionada:', option);
